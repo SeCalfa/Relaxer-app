@@ -10,9 +10,10 @@ namespace Game.Scripts
 
     public enum Picture
     {
-        First = 1,
-        Second = 2,
-        Third = 3
+        Action = 0,
+        Horror = 1,
+        Fantasy = 2,
+        Comedy = 3
     }
     
     public enum AppColor
@@ -33,8 +34,7 @@ namespace Game.Scripts
     {
         Planed = 1,
         InProgress = 2,
-        Finished = 3,
-        Frozen = 4
+        Frozen = 3
     }
 
     public enum TitleBoxType

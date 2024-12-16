@@ -12,7 +12,7 @@ namespace Game.Scripts
 
         private Title _title;
 
-        public void Init(RelaxApplication app, Title title, GameObject selectedFilmPage, GameObject selectedSerialPage, TitleBoxType titleBoxType)
+        public void Init(RelaxApplication app, Title title, GameObject selectedFilmPage, GameObject selectedSerialPage, TitleBoxType titleBoxType, Sprite picture)
         {
             _title = title;
 
@@ -21,7 +21,7 @@ namespace Game.Scripts
                 GetComponent<Button>().onClick.AddListener(delegate
                 {
                     app.OpenPage(selectedFilmPage);
-                    app.FillSelectedFilmPage($"{_title.name} ({_title.year})");
+                    app.FillSelectedFilmPage($"{_title.name} ({_title.year})", Picture.Fantasy);
                 });
             }
             else if (titleBoxType == TitleBoxType.Serial)
@@ -34,6 +34,8 @@ namespace Game.Scripts
             
             titleName.text = $"{_title.name} ({_title.year})";
             status.text = _title.titleStatus.ToString();
+
+            this.picture.sprite = picture;
         }
     }
 }

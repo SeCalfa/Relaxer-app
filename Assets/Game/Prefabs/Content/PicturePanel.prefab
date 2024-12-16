@@ -120,7 +120,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7462251238785463354}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4950280063400664106}
+        m_TargetAssemblyTypeName: PictureSelector, Assembly-CSharp
+        m_MethodName: ReplacePicture
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &3463665310094802019
 GameObject:
   m_ObjectHideFlags: 0
@@ -289,17 +301,15 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
-  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -382,7 +392,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -5199953049146085424, guid: 0487ae5369da7e140bf713cb9aa9b772, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6d16ae97eb6db5b43b1e785a0d8e1c4b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -401,6 +411,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4315186452209359959}
+  - component: {fileID: 4950280063400664106}
   m_Layer: 5
   m_Name: PicturePanel
   m_TagString: Untagged
@@ -429,3 +440,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -163.37}
   m_SizeDelta: {x: 908.59, y: 502.87}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &4950280063400664106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7264182918746616460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b758ecd14369dd47a293a904f8c5b14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  picture: {fileID: 7938270401072069255}
+  sprites:
+  - {fileID: 21300000, guid: 6d16ae97eb6db5b43b1e785a0d8e1c4b, type: 3}
+  - {fileID: 21300000, guid: 36cc2d761ff708b449bf06ace7a09efc, type: 3}
+  - {fileID: 21300000, guid: 59ea68966be1f4a429bd71538b8c1fa1, type: 3}
+  - {fileID: 21300000, guid: d1f5265011622a9418aad1b248d00bfe, type: 3}

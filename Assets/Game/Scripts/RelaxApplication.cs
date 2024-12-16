@@ -55,14 +55,20 @@ namespace Game.Scripts
         [Header("New film fields")]
         [SerializeField] private TMP_InputField newFilmName;
         [SerializeField] private TMP_InputField newFilmYear;
+        [SerializeField] private PictureSelector newFilmPictureSelector;
         
         [Header("New serial fields")]
         [SerializeField] private TMP_InputField newSerialName;
         [SerializeField] private TMP_InputField newSerialYear;
         [SerializeField] private TMP_InputField newSerialsSeasons;
+        [SerializeField] private PictureSelector newSerialPictureSelector;
         
         [Header("Selected film page")]
         [SerializeField] private TextMeshProUGUI selectedFilmTitle;
+        [SerializeField] private Image selectedFilmLogo;
+
+        [Space]
+        [SerializeField] private Sprite[] movieSprites;
 
         private GameObject _activePage;
         private CategoryStruct _activeSection;
@@ -206,7 +212,7 @@ namespace Game.Scripts
             _account.films.Add(new Title
             {
                 name = filmName,
-                pictureId = 0,
+                pictureId = newFilmPictureSelector.ActivePicture,
                 year = filmYear,
                 titleStatus = TitleStatus.Planed
             });
@@ -222,7 +228,7 @@ namespace Game.Scripts
             var serial = new Serial
             {
                 name = serialName,
-                pictureId = 0,
+                pictureId = newSerialPictureSelector.ActivePicture,
                 year = serialYear,
                 titleStatus = TitleStatus.Planed
             };
@@ -244,7 +250,7 @@ namespace Game.Scripts
                 _account.films.ForEach(film =>
                 {
                     var currentTitleBox = Instantiate(titleBox, titlesParent);
-                    currentTitleBox.GetComponent<TitleBox>().Init(this, film, selectedFilmPage, selectedSerialPage, TitleBoxType.Film);
+                    currentTitleBox.GetComponent<TitleBox>().Init(this, film, selectedFilmPage, selectedSerialPage, TitleBoxType.Film, movieSprites[newFilmPictureSelector.ActivePicture]);
                     
                     _activeTitleBoxes.Add(currentTitleBox);
                 });
@@ -254,7 +260,7 @@ namespace Game.Scripts
                 _account.serials.ForEach(film =>
                 {
                     var currentTitleBox = Instantiate(titleBox, titlesParent);
-                    currentTitleBox.GetComponent<TitleBox>().Init(this, film, selectedFilmPage, selectedSerialPage, TitleBoxType.Serial);
+                    currentTitleBox.GetComponent<TitleBox>().Init(this, film, selectedFilmPage, selectedSerialPage, TitleBoxType.Serial, movieSprites[newSerialPictureSelector.ActivePicture]);
                     
                     _activeTitleBoxes.Add(currentTitleBox);
                 });
@@ -271,9 +277,11 @@ namespace Game.Scripts
             newSerialsSeasons.text = string.Empty;
         }
 
-        public void FillSelectedFilmPage(string selectedFilmTitle)
+        public void FillSelectedFilmPage(string selectedFilmTitle, Picture picture)
         {
             this.selectedFilmTitle.text = selectedFilmTitle;
+
+            selectedFilmLogo.sprite = movieSprites[(int)picture];
         }
     }
 }
