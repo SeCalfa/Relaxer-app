@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "546752303304",
+    "firebase_url": "https://movies-app-420ee-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "movies-app-420ee",
+    "storage_bucket": "movies-app-420ee.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:546752303304:android:87d03e14543085cf5595fd",
+        "android_client_info": {
+          "package_name": "com.lelarus.relaxer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKL-FiXkEBNAaaqDEn2JTYeQXX0YX1bZw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
