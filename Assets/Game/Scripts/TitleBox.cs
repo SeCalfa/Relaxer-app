@@ -21,7 +21,7 @@ namespace Game.Scripts
                 GetComponent<Button>().onClick.AddListener(delegate
                 {
                     app.OpenPage(selectedFilmPage);
-                    app.FillSelectedFilmPage($"{_title.name} ({_title.year})", Picture.Fantasy);
+                    app.FillSelectedFilmPage($"{_title.name} ({_title.year})", picture, title);
                 });
             }
             else if (titleBoxType == TitleBoxType.Serial)
@@ -29,6 +29,7 @@ namespace Game.Scripts
                 GetComponent<Button>().onClick.AddListener(delegate
                 {
                     app.OpenPage(selectedSerialPage);
+                    app.FillSelectedSerialPage($"{_title.name} ({_title.year})", picture, title);
                 });
             }
             

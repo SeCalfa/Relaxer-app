@@ -1,24 +1,27 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PictureSelector : MonoBehaviour
+namespace Game.Scripts.Logic
 {
-    [SerializeField]
-    private Image picture;
-    [SerializeField]
-    private Sprite[] sprites;
-
-    public int ActivePicture { get; private set; } = 0;
-
-    public void ReplacePicture()
+    public class PictureSelector : MonoBehaviour
     {
-        ActivePicture += 1;
+        [SerializeField]
+        private Image picture;
+        [SerializeField]
+        private Sprite[] sprites;
 
-        if (ActivePicture == sprites.Length)
+        public int ActivePicture { get; private set; } = 0;
+
+        public void ReplacePicture()
         {
-            ActivePicture = 0;
-        }
+            ActivePicture += 1;
 
-        picture.sprite = sprites[ActivePicture];
+            if (ActivePicture == sprites.Length)
+            {
+                ActivePicture = 0;
+            }
+
+            picture.sprite = sprites[ActivePicture];
+        }
     }
 }

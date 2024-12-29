@@ -6,6 +6,7 @@ namespace Game.Scripts
     [Serializable]
     public class Title
     {
+        public string ID;
         public string name;
         public int year;
         public TitleStatus titleStatus;

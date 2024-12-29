@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Game.Scripts.Logic;
 using Game.Scripts.Logic.JsonReader;
 using UnityEngine;
 using UnityEngine.UI;
@@ -35,6 +36,10 @@ namespace Game.Scripts
         [SerializeField] private GameObject newTitlePage;
         [SerializeField] private GameObject selectedFilmPage;
         [SerializeField] private GameObject selectedSerialPage;
+        
+        [Header("Home page")]
+        [SerializeField] private TextMeshProUGUI homeName;
+        [SerializeField] private Transform homeInProgressTitlesParent;
 
         [Header("Category page")]
         [SerializeField] private CategoryStruct[] categoryStruct;
@@ -66,6 +71,20 @@ namespace Game.Scripts
         [Header("Selected film page")]
         [SerializeField] private TextMeshProUGUI selectedFilmTitle;
         [SerializeField] private Image selectedFilmLogo;
+        [SerializeField] private GameObject selectedFilmPlanedButton;
+        [SerializeField] private GameObject selectedFilmInProgressButton;
+        [SerializeField] private GameObject selectedFilmFrozenButton;
+        
+        [Header("Selected serial page")]
+        [SerializeField] private TextMeshProUGUI selectedSerialTitle;
+        [SerializeField] private Image selectedSerialLogo;
+        [SerializeField] private GameObject selectedSerialPlanedButton;
+        [SerializeField] private GameObject selectedSerialInProgressButton;
+        [SerializeField] private GameObject selectedSerialFrozenButton;
+
+        [Space]
+        [SerializeField] private Color statusButtonActiveColor;
+        [SerializeField] private Color statusButtonInactiveColor;
 
         [Space]
         [SerializeField] private Sprite[] movieSprites;
@@ -74,9 +93,11 @@ namespace Game.Scripts
         private CategoryStruct _activeSection;
         private NewTitlePageStruct _activeNewTitle;
         private List<GameObject> _activeTitleBoxes = new();
+        private List<GameObject> _inProgressTitleBoxes = new();
 
         private JsonHandler _jsonHandler;
         private Account _account;
+        private Title _selectedTitle;
         
         private void Awake()
         {
@@ -87,6 +108,7 @@ namespace Game.Scripts
             _activeNewTitle = newTitlePageStruct[1];
 
             InitApplicationView();
+            InitInProgressTitles();
         }
 
         private void OnDestroy()
@@ -119,6 +141,40 @@ namespace Game.Scripts
             
             // Open category on start
             InitTitleBoxes(1);
+
+            // Set name
+            homeName.text = _account.name;
+        }
+
+        public void InitInProgressTitles()
+        {
+            ClearInProgressTitles();
+            
+            _account.films.Where(f => f.titleStatus == TitleStatus.InProgress).ToList().ForEach(film =>
+            {
+                var currentTitleBox = Instantiate(titleBox, homeInProgressTitlesParent);
+                currentTitleBox.GetComponent<TitleBox>().Init(this, film, selectedFilmPage, selectedSerialPage, TitleBoxType.Film, movieSprites[film.pictureId]);
+                    
+                _inProgressTitleBoxes.Add(currentTitleBox);
+            });
+            
+            _account.serials.Where(f => f.titleStatus == TitleStatus.InProgress).ToList().ForEach(serial =>
+            {
+                var currentTitleBox = Instantiate(titleBox, homeInProgressTitlesParent);
+                currentTitleBox.GetComponent<TitleBox>().Init(this, serial, selectedFilmPage, selectedSerialPage, TitleBoxType.Serial, movieSprites[serial.pictureId]);
+                    
+                _inProgressTitleBoxes.Add(currentTitleBox);
+            });
+        }
+
+        private void ClearInProgressTitles()
+        {
+            foreach (var titleBox in _inProgressTitleBoxes)
+            {
+                Destroy(titleBox);
+            }
+            
+            _inProgressTitleBoxes.Clear();
         }
 
         private void CloseAllPages()
@@ -211,6 +267,7 @@ namespace Game.Scripts
             
             _account.films.Add(new Title
             {
+                ID = Guid.NewGuid().ToString(),
                 name = filmName,
                 pictureId = newFilmPictureSelector.ActivePicture,
                 year = filmYear,
@@ -227,6 +284,7 @@ namespace Game.Scripts
             
             var serial = new Serial
             {
+                ID = Guid.NewGuid().ToString(),
                 name = serialName,
                 pictureId = newSerialPictureSelector.ActivePicture,
                 year = serialYear,
@@ -250,17 +308,17 @@ namespace Game.Scripts
                 _account.films.ForEach(film =>
                 {
                     var currentTitleBox = Instantiate(titleBox, titlesParent);
-                    currentTitleBox.GetComponent<TitleBox>().Init(this, film, selectedFilmPage, selectedSerialPage, TitleBoxType.Film, movieSprites[newFilmPictureSelector.ActivePicture]);
+                    currentTitleBox.GetComponent<TitleBox>().Init(this, film, selectedFilmPage, selectedSerialPage, TitleBoxType.Film, movieSprites[film.pictureId]);
                     
                     _activeTitleBoxes.Add(currentTitleBox);
                 });
             }
             else if (category == 2) // Serials
             {
-                _account.serials.ForEach(film =>
+                _account.serials.ForEach(serial =>
                 {
                     var currentTitleBox = Instantiate(titleBox, titlesParent);
-                    currentTitleBox.GetComponent<TitleBox>().Init(this, film, selectedFilmPage, selectedSerialPage, TitleBoxType.Serial, movieSprites[newSerialPictureSelector.ActivePicture]);
+                    currentTitleBox.GetComponent<TitleBox>().Init(this, serial, selectedFilmPage, selectedSerialPage, TitleBoxType.Serial, movieSprites[serial.pictureId]);
                     
                     _activeTitleBoxes.Add(currentTitleBox);
                 });
@@ -277,11 +335,121 @@ namespace Game.Scripts
             newSerialsSeasons.text = string.Empty;
         }
 
-        public void FillSelectedFilmPage(string selectedFilmTitle, Picture picture)
+        public void FillSelectedFilmPage(string selectedFilmTitle, Sprite picture, Title title)
         {
             this.selectedFilmTitle.text = selectedFilmTitle;
+            _selectedTitle = title;
 
-            selectedFilmLogo.sprite = movieSprites[(int)picture];
+            selectedFilmLogo.sprite = picture;
+
+            ResetButtonFilmStatus(title);
+        }
+        
+        public void FillSelectedSerialPage(string selectedSerialTitle, Sprite picture, Title title)
+        {
+            this.selectedSerialTitle.text = selectedSerialTitle;
+            _selectedTitle = title;
+
+            selectedSerialLogo.sprite = picture;
+
+            ResetButtonSerialStatus(title);
+        }
+
+        public void SetPlanedStatusFilm()
+        {
+            _selectedTitle.titleStatus = TitleStatus.Planed;
+            ResetButtonFilmStatus(_selectedTitle);
+        }
+
+        public void SetInProgressStatusFilm()
+        {
+            _selectedTitle.titleStatus = TitleStatus.InProgress;
+            ResetButtonFilmStatus(_selectedTitle);
+        }
+
+        public void SetFrozenStatusFilm()
+        {
+            _selectedTitle.titleStatus = TitleStatus.Frozen;
+            ResetButtonFilmStatus(_selectedTitle);
+        }
+        
+        public void SetPlanedStatusSerial()
+        {
+            _selectedTitle.titleStatus = TitleStatus.Planed;
+            ResetButtonSerialStatus(_selectedTitle);
+        }
+
+        public void SetInProgressStatusSerial()
+        {
+            _selectedTitle.titleStatus = TitleStatus.InProgress;
+            ResetButtonSerialStatus(_selectedTitle);
+        }
+
+        public void SetFrozenStatusSerial()
+        {
+            _selectedTitle.titleStatus = TitleStatus.Frozen;
+            ResetButtonSerialStatus(_selectedTitle);
+        }
+
+        public void RemoveSelectedTitle()
+        {
+            var filmToRemove = _account.films.FirstOrDefault(f => f.ID == _selectedTitle.ID);
+            var serialToRemove = _account.serials.FirstOrDefault(f => f.ID == _selectedTitle.ID);
+
+            if (filmToRemove != null)
+            {
+                _account.films.Remove(filmToRemove);
+                return;
+            }
+            
+            if (serialToRemove != null)
+            {
+                _account.serials.Remove(serialToRemove);
+            }
+        }
+
+        private void ResetButtonFilmStatus(Title title)
+        {
+            if (title.titleStatus == TitleStatus.Planed)
+            {
+                selectedFilmPlanedButton.GetComponent<Image>().color = statusButtonActiveColor;
+                selectedFilmInProgressButton.GetComponent<Image>().color = statusButtonInactiveColor;
+                selectedFilmFrozenButton.GetComponent<Image>().color = statusButtonInactiveColor;
+            }
+            else if (title.titleStatus == TitleStatus.InProgress)
+            {
+                selectedFilmPlanedButton.GetComponent<Image>().color = statusButtonInactiveColor;
+                selectedFilmInProgressButton.GetComponent<Image>().color = statusButtonActiveColor;
+                selectedFilmFrozenButton.GetComponent<Image>().color = statusButtonInactiveColor;
+            }
+            else if (title.titleStatus == TitleStatus.Frozen)
+            {
+                selectedFilmPlanedButton.GetComponent<Image>().color = statusButtonInactiveColor;
+                selectedFilmInProgressButton.GetComponent<Image>().color = statusButtonInactiveColor;
+                selectedFilmFrozenButton.GetComponent<Image>().color = statusButtonActiveColor;
+            }
+        }
+        
+        private void ResetButtonSerialStatus(Title title)
+        {
+            if (title.titleStatus == TitleStatus.Planed)
+            {
+                selectedSerialPlanedButton.GetComponent<Image>().color = statusButtonActiveColor;
+                selectedSerialInProgressButton.GetComponent<Image>().color = statusButtonInactiveColor;
+                selectedSerialFrozenButton.GetComponent<Image>().color = statusButtonInactiveColor;
+            }
+            else if (title.titleStatus == TitleStatus.InProgress)
+            {
+                selectedSerialPlanedButton.GetComponent<Image>().color = statusButtonInactiveColor;
+                selectedSerialInProgressButton.GetComponent<Image>().color = statusButtonActiveColor;
+                selectedSerialFrozenButton.GetComponent<Image>().color = statusButtonInactiveColor;
+            }
+            else if (title.titleStatus == TitleStatus.Frozen)
+            {
+                selectedSerialPlanedButton.GetComponent<Image>().color = statusButtonInactiveColor;
+                selectedSerialInProgressButton.GetComponent<Image>().color = statusButtonInactiveColor;
+                selectedSerialFrozenButton.GetComponent<Image>().color = statusButtonActiveColor;
+            }
         }
     }
 }
